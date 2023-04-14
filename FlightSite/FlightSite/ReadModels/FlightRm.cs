@@ -9,7 +9,7 @@ namespace FlightSite.ReadModels
         Guid Id,
         string Airline,
         string Price,
-        TimePlaceRM Departue,
+        TimePlaceRM departure,
         TimePlaceRM Arrival,
         int RemainingNumberOfSeats
         );
