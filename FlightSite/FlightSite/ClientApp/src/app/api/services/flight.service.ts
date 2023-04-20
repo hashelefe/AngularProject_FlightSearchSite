@@ -9,6 +9,7 @@ import { RequestBuilder } from '../request-builder';
 import { Observable } from 'rxjs';
 import { map, filter } from 'rxjs/operators';
 
+import { BookDto } from '../models/book-dto';
 import { FlightRm } from '../models/flight-rm';
 
 @Injectable({
@@ -117,7 +118,62 @@ export class FlightService extends BaseService {
     );
   }
 
+  /**
+   * Path part for operation bookFlight
+   */
+  static readonly BookFlightPath = '/Flight';
 
+  /**
+   * This method provides access to the full `HttpResponse`, allowing access to response headers.
+   * To access only the response body, use `bookFlight()` instead.
+   *
+   * This method sends `application/*+json` and handles request body of type `application/*+json`.
+   */
+  bookFlight$Response(params?: {
+    body?: BookDto
+  },
+  context?: HttpContext
+
+): Observable<StrictHttpResponse<void>> {
+
+    const rb = new RequestBuilder(this.rootUrl, FlightService.BookFlightPath, 'post');
+    if (params) {
+      rb.body(params.body, 'application/*+json');
+    }
+
+    return this.http.request(rb.build({
+      responseType: 'text',
+      accept: '*/*',
+      context: context
+    })).pipe(
+      filter((r: any) => r instanceof HttpResponse),
+      map((r: HttpResponse<any>) => {
+        return (r as HttpResponse<any>).clone({ body: undefined }) as StrictHttpResponse<void>;
+      })
+    );
+  }
+
+  /**
+   * This method provides access only to the response body.
+   * To access the full response (for headers, for example), `bookFlight$Response()` instead.
+   *
+   * This method sends `application/*+json` and handles request body of type `application/*+json`.
+   */
+  bookFlight(params?: {
+    body?: BookDto
+  },
+  context?: HttpContext
+
+): Observable<void> {
+
+    return this.bookFlight$Response(params,context).pipe(
+      map((r: StrictHttpResponse<void>) => r.body as void)
+    );
+  }
+
+  /**
+   * Path part for operation findFlight
+   */
   static readonly FindFlightPath = '/Flight/{id}';
 
   /**
@@ -128,7 +184,10 @@ export class FlightService extends BaseService {
    */
   findFlight$Plain$Response(params: {
     id: string;
-  }): Observable<StrictHttpResponse<FlightRm>> {
+  },
+  context?: HttpContext
+
+): Observable<StrictHttpResponse<FlightRm>> {
 
     const rb = new RequestBuilder(this.rootUrl, FlightService.FindFlightPath, 'get');
     if (params) {
@@ -137,7 +196,8 @@ export class FlightService extends BaseService {
 
     return this.http.request(rb.build({
       responseType: 'text',
-      accept: 'text/plain'
+      accept: 'text/plain',
+      context: context
     })).pipe(
       filter((r: any) => r instanceof HttpResponse),
       map((r: HttpResponse<any>) => {
@@ -147,16 +207,19 @@ export class FlightService extends BaseService {
   }
 
   /**
-   * This method provides access to only to the response body.
+   * This method provides access only to the response body.
    * To access the full response (for headers, for example), `findFlight$Plain$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
   findFlight$Plain(params: {
     id: string;
-  }): Observable<FlightRm> {
+  },
+  context?: HttpContext
 
-    return this.findFlight$Plain$Response(params).pipe(
+): Observable<FlightRm> {
+
+    return this.findFlight$Plain$Response(params,context).pipe(
       map((r: StrictHttpResponse<FlightRm>) => r.body as FlightRm)
     );
   }
@@ -169,7 +232,10 @@ export class FlightService extends BaseService {
    */
   findFlight$Response(params: {
     id: string;
-  }): Observable<StrictHttpResponse<FlightRm>> {
+  },
+  context?: HttpContext
+
+): Observable<StrictHttpResponse<FlightRm>> {
 
     const rb = new RequestBuilder(this.rootUrl, FlightService.FindFlightPath, 'get');
     if (params) {
@@ -178,7 +244,8 @@ export class FlightService extends BaseService {
 
     return this.http.request(rb.build({
       responseType: 'json',
-      accept: 'text/json'
+      accept: 'text/json',
+      context: context
     })).pipe(
       filter((r: any) => r instanceof HttpResponse),
       map((r: HttpResponse<any>) => {
@@ -188,17 +255,21 @@ export class FlightService extends BaseService {
   }
 
   /**
-   * This method provides access to only to the response body.
+   * This method provides access only to the response body.
    * To access the full response (for headers, for example), `findFlight$Response()` instead.
    *
    * This method doesn't expect any request body.
    */
   findFlight(params: {
     id: string;
-  }): Observable<FlightRm> {
+  },
+  context?: HttpContext
 
-    return this.findFlight$Response(params).pipe(
+): Observable<FlightRm> {
+
+    return this.findFlight$Response(params,context).pipe(
       map((r: StrictHttpResponse<FlightRm>) => r.body as FlightRm)
     );
   }
+
 }

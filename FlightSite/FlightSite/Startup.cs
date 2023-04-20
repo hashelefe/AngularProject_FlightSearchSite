@@ -44,7 +44,11 @@ namespace FlightSite
         {
             if (env.IsDevelopment())
             {
-                app.UseCors(builder => builder.WithOrigins("*"));
+                app.UseCors(builder => builder
+                .WithOrigins("*")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                );
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.UseDeveloperExceptionPage();
