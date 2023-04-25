@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
@@ -13,7 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.17" />
+	<PackageReference Include="Microsoft.Build" Version="17.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.16" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
@@ -25,10 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="ClientApp\Domain\Entities\OverbookError.cs" />
     <Compile Remove="WeatherForecast.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\Domain\Entities\Booking.cs" />
     <None Remove="ClientApp\Domain\Entities\Flight.cs" />
     <None Remove="ClientApp\Domain\Entities\Passenger.cs" />
     <None Remove="ClientApp\Domain\Entities\TimePlace.cs" />

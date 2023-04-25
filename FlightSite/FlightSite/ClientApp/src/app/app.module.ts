@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { AuthGuard } from './auth/auth.guard';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -29,9 +30,9 @@ import { MyBookingsComponent } from './my-bookings/my-bookings.component';
     RouterModule.forRoot([
       { path: '', component: SearchflightsComponent, pathMatch: 'full' },
       { path: 'search-flights', component: SearchflightsComponent },
-      { path: 'book-flight/:flightId', component: BookFlightComponent, pathMatch: 'full' },
+      { path: 'book-flight/:flightId', component: BookFlightComponent, canActivate:[AuthGuard], pathMatch: 'full' },
       { path: 'register-passenger', component: RegisterPassengerComponent, pathMatch: 'full' },
-      { path: 'my-bookings/:flightId', component: MyBookingsComponent, pathMatch: 'full' },
+      { path: 'my-bookings', component: MyBookingsComponent, canActivate: [AuthGuard], pathMatch: 'full' },
 
     ])
   ],

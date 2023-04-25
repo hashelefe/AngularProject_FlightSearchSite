@@ -75,7 +75,7 @@
 
       <input formControlName="number" type="number" class="form-control" id="numberOfSeats" name="numberOfSeats"
              placeholder="Number of Seats" />
-      <button type="submit" class="btn btn-primary">
+      <button *ngIf="form.controls.number.value<=flight.remainingNumberOfSeats" type="submit" class="btn btn-primary">
         <i class="fas fa-ticket"></i>
         Book
       </button>

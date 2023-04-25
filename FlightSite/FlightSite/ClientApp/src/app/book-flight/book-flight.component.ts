@@ -25,10 +25,6 @@ export class BookFlightComponent {
 
 
   ngOnInit(): void {
-
-    if (!this.authService.currentUser)
-      this.router.navigate(['/register-passenger'])
-
     this.route.paramMap
       .subscribe(p => this.findFlight(p.get("flightId")))
 
@@ -50,6 +46,11 @@ export class BookFlightComponent {
       this.router.navigate(['/search-flights']);
     }
 
+    if (err.status == 409) {
+      console.log("err " + err);
+      alert(JSON.parse(err.error).message);
+    }
+
     console.log("Response Error Status: ", err.status);
     console.log("Response Text: ", err.statusText);
     console.log(err);
@@ -67,8 +68,11 @@ export class BookFlightComponent {
       numberOfSeats: this.form.get('number')?.value
     }
 
+
     this.flightService.bookFlight({ body: booking })
-      .subscribe(_ => this.router.navigate['/my-bookings/this.flight.Id'], this.handleError)
+      .subscribe(_ => this.router.navigate(['../my-bookings/']))
+
+    console.log("Navigating")
   }
 
   get number() {

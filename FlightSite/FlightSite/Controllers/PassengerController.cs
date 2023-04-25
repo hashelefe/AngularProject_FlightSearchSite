@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using FlightSite.DTOs;
 using FlightSite.ReadModels;
+using FlightSite.Domain.Entities;
+using FlightSite.Data;
 
 namespace FlightSite.Controllers
 {
@@ -13,7 +15,12 @@ namespace FlightSite.Controllers
     [ApiController]
     public class PassengerController : ControllerBase
     {
-        static private IList<NewPassengerDTO> Passengers = new List<NewPassengerDTO>();
+        private readonly Entities _entities;
+
+        public PassengerController(Entities entities)
+        {
+            _entities = entities;
+        }
 
         [HttpPost]
         [ProducesResponseType(201)]
@@ -22,14 +29,21 @@ namespace FlightSite.Controllers
 
         public IActionResult Register(NewPassengerDTO dto)
         {
-            Passengers.Add(dto);
-            System.Diagnostics.Debug.WriteLine(Passengers.Count);
+            _entities.Passengers.Add(new Passenger(
+                dto.Email,
+                dto.FirstName,
+                dto.LastName,
+                dto.Gender));
+
+            _entities.SaveChanges();
+
+
             return CreatedAtAction(nameof(Find), new { email = dto.Email });
         }
         [HttpGet("{email}")]
         public ActionResult<PassengerRm> Find(string email)
         {
-            var passenger = Passengers.FirstOrDefault(x => x.Email == email);
+            var passenger = _entities.Passengers.FirstOrDefault(x => x.Email == email);
             if (passenger == null)
                 return NotFound();
 
