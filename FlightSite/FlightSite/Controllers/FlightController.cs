@@ -28,9 +28,32 @@ namespace FlightSite.Controllers
 
 
     [HttpGet]
-    public IEnumerable<FlightRm> Search()
+    public IEnumerable<FlightRm> Search([FromQuery] FlightSearchParameters @params)
         {
-            var flightRm = _entities.Flights.Select(flight => new FlightRm(
+            _logger.LogInformation("Searching for a flight to {Destination}", @params.Destination);
+
+            IQueryable<Flight> flights = _entities.Flights;
+            if(!string.IsNullOrWhiteSpace(@params.Destination)) 
+                flights = flights.Where(f => f.Arrival.Place.Contains(@params.Destination));
+            
+            if(!string.IsNullOrWhiteSpace(@params.Source)) 
+                flights = flights.Where(f => f.Departure.Place.Contains(@params.Source));    
+            
+            if(@params.FromDate != null)
+                flights=flights.Where(f=>f.Departure.Time >=  @params.FromDate.Value.Date);
+            
+            if(@params.ToDate != null)
+                flights=flights.Where(f=>f.Departure.Time >=  @params.ToDate.Value.Date.AddDays(1).AddTicks(-1));
+
+            if (@params.NumberOfPassenger != null && @params.NumberOfPassenger != 0)
+                flights = flights.Where(f => f.RemainingNumberOfSeats >= @params.NumberOfPassenger);
+            else
+                flights = flights.Where(f => f.RemainingNumberOfSeats >= 1);
+
+
+
+            var flightRm = _entities.Flights
+                .Select(flight => new FlightRm(
                 flight.Id,
                 flight.Airline,
                 flight.Price,

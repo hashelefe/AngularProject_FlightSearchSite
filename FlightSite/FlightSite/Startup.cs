@@ -10,6 +10,7 @@ using FlightSite.Data;
 using System;
 using FlightSite.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace FlightSite
 {
@@ -25,19 +26,23 @@ namespace FlightSite
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //Database Context
             services.AddDbContext<Entities>(options => 
-            options.UseInMemoryDatabase(databaseName: "Flights"), ServiceLifetime.Singleton);
+            options.UseSqlServer(Configuration.GetConnectionString("Flights")));
             services.AddControllersWithViews();
+
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
             services.AddMvc();
-            services.AddSingleton<Entities>();
+            services.AddScoped<Entities>();
         
             services.AddSwaggerGen(c =>
             {
+                c.DescribeAllParametersInCamelCase();
                 c.AddServer(new OpenApiServer {
                     Description="Development Server",
                     Url= "https://localhost:5001"
@@ -53,10 +58,12 @@ namespace FlightSite
             if (env.IsDevelopment())
             {
                 var entities = app.ApplicationServices.CreateScope().ServiceProvider.GetService<Entities>();
+                entities.Database.EnsureCreated();
                 var random = new Random();
 
-                Flight[] flightsToSeed = new Flight[]
+                if (!entities.Flights.Any())
                 {
+                    Flight[] flightsToSeed = new Flight[]{
                     new (   Guid.NewGuid(),
                 "American Airlines",
                 random.Next(90, 5000).ToString(),
@@ -105,9 +112,11 @@ namespace FlightSite
                 new TimePlace("Le Bourget",DateTime.Now.AddHours(random.Next(1, 58))),
                 new TimePlace("Zagreb",DateTime.Now.AddHours(random.Next(4, 60))),
                     random.Next(1, 853))
-                };
-                entities.Flights.AddRange(flightsToSeed);
-                entities.SaveChanges();
+                    };
+                    entities.Flights.AddRange(flightsToSeed);
+                    entities.SaveChanges();
+                }
+                
 
                 app.UseCors(builder => builder
                 .WithOrigins("*")
